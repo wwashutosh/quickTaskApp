@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:parse_server_sdk_flutter/parse_server_sdk_flutter.dart'; // For date formatting
+import 'package:quick_task_app_assignment/login_page.dart'; // Import the login page
 
 class TaskListPage extends StatefulWidget {
   @override
@@ -44,48 +45,87 @@ class _TaskListPageState extends State<TaskListPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Task List'),
+        backgroundColor: Colors.blue,
+        actions: [
+          IconButton(
+            icon: Icon(Icons.logout),
+            onPressed: () {
+              _logout(context);
+            },
+          ),
+        ],
       ),
-      body: ListView.builder(
-        itemCount: tasks.length,
-        itemBuilder: (context, index) {
-          final task = tasks[index];
-          return ListTile(
-            title: Text(task.taskName),
-            subtitle: Text(
-                'Due: ${DateFormat('yyyy-MM-dd').format(task.taskDueDate)}'),
-            trailing: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Checkbox(
+      body: Container(
+        padding: EdgeInsets.all(16.0),
+        child: ListView.builder(
+          itemCount: tasks.length,
+          itemBuilder: (context, index) {
+            final task = tasks[index];
+            return Card(
+              elevation: 4,
+              margin: EdgeInsets.symmetric(vertical: 8.0),
+              child: ListTile(
+                leading: Checkbox(
                   value: task.isCompleted,
-                  onChanged: (bool? newValue) {
+                  onChanged: (value) {
                     setState(() {
-                      task.isCompleted = newValue ?? false;
+                      task.isCompleted = value!;
                     });
                   },
                 ),
-                IconButton(
-                  icon: Icon(Icons.edit),
-                  onPressed: () {
-                    _editTask(context, task);
-                  },
+                title: Text(
+                  task.taskName,
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
-                IconButton(
-                  icon: Icon(Icons.delete),
-                  onPressed: () {
-                    _deleteTask(task);
-                  },
+                subtitle: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    SizedBox(height: 8.0),
+                    Text(
+                      'Due: ${DateFormat('yyyy-MM-dd').format(task.taskDueDate)}',
+                      style: TextStyle(
+                        color: Colors.grey,
+                      ),
+                    ),
+                    SizedBox(height: 4.0),
+                    Text(
+                      task.taskDesc,
+                      style: TextStyle(
+                        color: Colors.grey[700],
+                      ),
+                    ),
+                  ],
                 ),
-              ],
-            ),
-          );
-        },
+                trailing: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    IconButton(
+                      icon: Icon(Icons.edit),
+                      onPressed: () {
+                        _editTask(context, task);
+                      },
+                    ),
+                    IconButton(
+                      icon: Icon(Icons.delete),
+                      onPressed: () {
+                        _deleteTask(task);
+                      },
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+        ),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           _addTask(context);
         },
         child: Icon(Icons.add),
+        backgroundColor: Colors.blue,
       ),
     );
   }
@@ -275,6 +315,13 @@ class _TaskListPageState extends State<TaskListPage> {
         content: Text(message),
         duration: Duration(seconds: 2),
       ),
+    );
+  }
+
+  void _logout(BuildContext context) {
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => LoginPage()),
     );
   }
 }
